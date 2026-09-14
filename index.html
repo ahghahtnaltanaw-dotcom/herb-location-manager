@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة ومواقع الأعشاب - متعدد المستخدمين</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+
+  <div class="max-w-3xl mx-auto space-y-6">
+    
+    <!-- رأس الصفحة واختيار المستخدم -->
+    <header class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold text-emerald-400">محدد مواقع الأعشاب</h1>
+        <p class="text-slate-400 text-xs">قاعدة بيانات مفهرسة لكل مستخدم على حدة</p>
+      </div>
+
+      <!-- تبديل أو تسجيل مستخدم جديد -->
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <label class="text-xs text-slate-300 whitespace-nowrap">المستخدم الحالي:</label>
+        <select id="userSelector" onchange="switchUser()" class="bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-emerald-300 focus:outline-none">
+          <!-- خيارات المستخدمين تظهر هنا -->
+        </select>
+        <button onclick="createNewUser()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-2.5 py-2 rounded-lg whitespace-nowrap">
+          + شخص جديد
+        </button>
+      </div>
+    </header>
+
+    <!-- شريط البحث السريع -->
+    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow">
+      <label class="block text-sm font-semibold mb-2 text-emerald-300">🔍 ابحث عن موقع عشبة:</label>
+      <input type="text" id="searchInput" oninput="searchHerbs()" placeholder="اكتب اسم العشبة..." class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
+      
+      <!-- نتيجة البحث -->
+      <div id="searchAlert" class="mt-3 hidden p-3 rounded-lg text-center font-bold text-base"></div>
+    </div>
+
+    <!-- إضافة أعشاب -->
+    <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow space-y-4">
+      <h2 class="text-base font-bold text-slate-200">➕ إضافة أعشاب إلى فهرس (<span id="currentUserName" class="text-emerald-400"></span>)</h2>
+      
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">اسم العشبة (يمكنك كتابة عدة أسماء مفصولة بفاصلة ، أو سطر جديد):</label>
+        <textarea id="herbNames" rows="2" placeholder="مثال: لسان الحمل، سواك الرعيان، الدّاد" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-sm"></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">الطابق (الرف):</label>
+          <select id="floorSelect" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-white focus:outline-none text-sm">
+            <option value="الطابق الأول">الطابق 1</option>
+            <option value="الطابق الثاني">الطابق 2</option>
+            <option value="الطابق الثالث">الطابق 3</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">الجهة:</label>
+          <select id="sideSelect" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-white focus:outline-none text-sm">
+            <option value="اليمين">على اليمين</option>
+            <option value="اليسار">على اليسار</option>
+          </select>
+        </div>
+      </div>
+
+      <button onclick="addHerbs()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg transition text-sm">
+        حفظ المواقع
+      </button>
+    </div>
+
+    <!-- جدول عرض الأعشاب -->
+    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-sm text-slate-200">الأعشاب المسجلة (<span id="totalCount">0</span>)</h3>
+        <button onclick="clearUserHerbs()" class="text-xs text-rose-400 hover:text-rose-300 underline">مسح سجل هذا المستخدم</button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-right text-sm">
+          <thead class="bg-slate-900/60 text-slate-400 border-b border-slate-700 text-xs">
+            <tr>
+              <th class="p-2.5">العشبة</th>
+              <th class="p-2.5">الموقع التخزيني</th>
+              <th class="p-2.5 text-center">إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="herbsTableBody" class="divide-y divide-slate-700 text-slate-300">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // جلب قائمة المستخدمين والمستخدم النشط
+    let usersList = JSON.parse(localStorage.getItem('herb_users_list') || '["المستخدم 1"]');
+    let currentUser = localStorage.getItem('active_herb_user') || usersList[0];
+
+    function initApp() {
+      if (!usersList.includes(currentUser)) {
+        currentUser = usersList[0];
+      }
+      localStorage.setItem('active_herb_user', currentUser);
+      localStorage.setItem('herb_users_list', JSON.stringify(usersList));
+
+      updateUserSelectorUI();
+      renderTable();
+    }
+
+    function updateUserSelectorUI() {
+      const select = document.getElementById('userSelector');
+      select.innerHTML = '';
+      usersList.forEach(user => {
+        const opt = document.createElement('option');
+        opt.value = user;
+        opt.textContent = user;
+        if (user === currentUser) opt.selected = true;
+        select.appendChild(opt);
+      });
+      document.getElementById('currentUserName').textContent = currentUser;
+    }
+
+    function createNewUser() {
+      const name = prompt('أدخل اسم الشخص أو المعرف الجديد:');
+      if (name && name.trim()) {
+        const trimmed = name.trim();
+        if (!usersList.includes(trimmed)) {
+          usersList.push(trimmed);
+          localStorage.setItem('herb_users_list', JSON.stringify(usersList));
+        }
+        currentUser = trimmed;
+        localStorage.setItem('active_herb_user', currentUser);
+        updateUserSelectorUI();
+        renderTable();
+      }
+    }
+
+    function switchUser() {
+      currentUser = document.getElementById('userSelector').value;
+      localStorage.setItem('active_herb_user', currentUser);
+      document.getElementById('currentUserName').textContent = currentUser;
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchAlert').className = 'hidden';
+      renderTable();
+    }
+
+    function getActiveUserData() {
+      const userKey = `herbs_data_${currentUser}`;
+      return JSON.parse(localStorage.getItem(userKey) || '[]');
+    }
+
+    function saveActiveUserData(data) {
+      const userKey = `herbs_data_${currentUser}`;
+      localStorage.setItem(userKey, JSON.stringify(data));
+      renderTable();
+      searchHerbs();
+    }
+
+    function addHerbs() {
+      const rawNames = document.getElementById('herbNames').value.trim();
+      const floor = document.getElementById('floorSelect').value;
+      const side = document.getElementById('sideSelect').value;
+
+      if (!rawNames) {
+        alert('يرجى إدخال اسم العشبة أولاً');
+        return;
+      }
+
+      const list = getActiveUserData();
+      const names = rawNames.split(/[\n,،]+/).map(n => n.trim()).filter(Boolean);
+
+      names.forEach(name => {
+        const index = list.findIndex(h => h.name.toLowerCase() === name.toLowerCase());
+        if (index > -1) {
+          list[index].floor = floor;
+          list[index].side = side;
+        } else {
+          list.unshift({ name, floor, side });
+        }
+      });
+
+      document.getElementById('herbNames').value = '';
+      saveActiveUserData(list);
+    }
+
+    function deleteHerb(index) {
+      const list = getActiveUserData();
+      list.splice(index, 1);
+      saveActiveUserData(list);
+    }
+
+    function clearUserHerbs() {
+      if (confirm(`هل أنت متأكد من مسح جميع بيانات (${currentUser})؟`)) {
+        saveActiveUserData([]);
+      }
+    }
+
+    function searchHerbs() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const alertBox = document.getElementById('searchAlert');
+      const list = getActiveUserData();
+
+      if (!query) {
+        alertBox.className = 'hidden';
+        renderTable(list);
+        return;
+      }
+
+      const match = list.find(h => h.name.toLowerCase().includes(query));
+      const filtered = list.filter(h => h.name.toLowerCase().includes(query));
+
+      alertBox.classList.remove('hidden');
+      if (match) {
+        alertBox.className = 'mt-3 p-3 rounded-lg text-center font-bold text-sm bg-emerald-950/80 border border-emerald-500 text-emerald-200';
+        alertBox.innerHTML = `📍 موقع <span class="text-white underline">${match.name}</span>: <span class="text-yellow-400">${match.floor} — على ${match.side}</span>`;
+      } else {
+        alertBox.className = 'mt-3 p-3 rounded-lg text-center font-semibold text-xs bg-rose-950/60 border border-rose-500/50 text-rose-300';
+        alertBox.textContent = 'العشبة غير مسجلة في قائمة هذا المستخدم.';
+      }
+
+      renderTable(filtered);
+    }
+
+    function renderTable(displayList = null) {
+      const list = displayList !== null ? displayList : getActiveUserData();
+      const tbody = document.getElementById('herbsTableBody');
+      document.getElementById('totalCount').textContent = getActiveUserData().length;
+      tbody.innerHTML = '';
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-slate-500 text-xs">لا توجد أعشاب مسجلة.</td></tr>';
+        return;
+      }
+
+      list.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-700/40 transition';
+        tr.innerHTML = `
+          <td class="p-2.5 font-medium text-slate-100">${item.name}</td>
+          <td class="p-2.5">
+            <span class="inline-block bg-slate-900 border border-slate-700 rounded px-2 py-0.5 text-xs text-yellow-300">
+              ${item.floor} على ${item.side}
+            </span>
+          </td>
+          <td class="p-2.5 text-center">
+            <button onclick="deleteHerb(${idx})" class="text-xs text-rose-400 hover:text-rose-300">حذف</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
