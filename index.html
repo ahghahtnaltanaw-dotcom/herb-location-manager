@@ -2,120 +2,191 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام إدارة ومواقع الأعشاب - متعدد المستخدمين</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مساعد إدارة الأعشاب</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Cairo', sans-serif; }
+    body { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .nav-active { color: #34d399 !important; }
+    .nav-active svg { stroke: #34d399 !important; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24">
 
-  <div class="max-w-3xl mx-auto space-y-6">
-    
-    <!-- رأس الصفحة واختيار المستخدم -->
-    <header class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex flex-col md:flex-row justify-between items-center gap-4">
+  <!-- الرأس العلوي الثابت -->
+  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 shadow-sm">
+    <div class="max-w-md mx-auto flex items-center justify-between">
       <div>
-        <h1 class="text-xl md:text-2xl font-bold text-emerald-400">محدد مواقع الأعشاب</h1>
-        <p class="text-slate-400 text-xs">قاعدة بيانات مفهرسة لكل مستخدم على حدة</p>
+        <h1 class="text-base font-bold text-emerald-400">محدد مواقع الأعشاب</h1>
+        <p class="text-[11px] text-slate-400">البروفايل: <span id="currentProfileNameHeader" class="text-white font-semibold"></span></p>
       </div>
-
-      <!-- تبديل أو تسجيل مستخدم جديد -->
-      <div class="flex items-center gap-2 w-full md:w-auto">
-        <label class="text-xs text-slate-300 whitespace-nowrap">المستخدم الحالي:</label>
-        <select id="userSelector" onchange="switchUser()" class="bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-emerald-300 focus:outline-none">
-          <!-- خيارات المستخدمين تظهر هنا -->
+      <div class="flex items-center gap-2">
+        <select id="userSelector" onchange="switchUser()" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-emerald-300 focus:outline-none max-w-[130px] truncate">
         </select>
-        <button onclick="createNewUser()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-2.5 py-2 rounded-lg whitespace-nowrap">
-          + شخص جديد
+      </div>
+    </div>
+  </header>
+
+  <!-- المحتوى التفاعلي (3 تبويبات) -->
+  <main class="max-w-md mx-auto p-4">
+
+    <!-- 1. نافذة الإضافة والمخزون -->
+    <section id="tab-add" class="space-y-4">
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow space-y-3">
+        <h2 class="text-sm font-bold text-slate-200">➕ تسجيل مواقع جديدة</h2>
+        
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">اسم العشبة (واحدة أو أكثر مفصولة بفاصلة ،):</label>
+          <textarea id="herbNames" rows="2" oninput="checkDuplicateOnInput()" placeholder="مثال: لسان الحمل، سانوج، داد" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"></textarea>
+          <!-- تنبيه التكرار الفوري -->
+          <div id="duplicateAlert" class="hidden mt-1.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-semibold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">الطابق (الرف):</label>
+            <select id="floorSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white focus:outline-none">
+              <option value="الطابق الأول">الطابق 1</option>
+              <option value="الطابق الثاني">الطابق 2</option>
+              <option value="الطابق الثالث">الطابق 3</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">الجهة:</label>
+            <select id="sideSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white focus:outline-none">
+              <option value="اليمين">على اليمين</option>
+              <option value="اليسار">على اليسار</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="addHerbs()" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition text-sm shadow mt-1">
+          حفظ في الرفوف
         </button>
       </div>
-    </header>
 
-    <!-- شريط البحث السريع -->
-    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow">
-      <label class="block text-sm font-semibold mb-2 text-emerald-300">🔍 ابحث عن موقع عشبة:</label>
-      <input type="text" id="searchInput" oninput="searchHerbs()" placeholder="اكتب اسم العشبة..." class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
-      
-      <!-- نتيجة البحث -->
-      <div id="searchAlert" class="mt-3 hidden p-3 rounded-lg text-center font-bold text-base"></div>
-    </div>
-
-    <!-- إضافة أعشاب -->
-    <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow space-y-4">
-      <h2 class="text-base font-bold text-slate-200">➕ إضافة أعشاب إلى فهرس (<span id="currentUserName" class="text-emerald-400"></span>)</h2>
-      
-      <div>
-        <label class="block text-xs text-slate-400 mb-1">اسم العشبة (يمكنك كتابة عدة أسماء مفصولة بفاصلة ، أو سطر جديد):</label>
-        <textarea id="herbNames" rows="2" placeholder="مثال: لسان الحمل، سواك الرعيان، الدّاد" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-sm"></textarea>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">الطابق (الرف):</label>
-          <select id="floorSelect" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-white focus:outline-none text-sm">
-            <option value="الطابق الأول">الطابق 1</option>
-            <option value="الطابق الثاني">الطابق 2</option>
-            <option value="الطابق الثالث">الطابق 3</option>
-          </select>
+      <!-- قائمة مخزون البروفايل الحالي -->
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="font-bold text-xs text-slate-300">مخزون البروفايل (<span id="totalCount">0</span>)</h3>
+          <button onclick="promptClearUserHerbs()" class="text-[11px] text-rose-400 hover:text-rose-300 underline">مسح السجل</button>
         </div>
 
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">الجهة:</label>
-          <select id="sideSelect" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-white focus:outline-none text-sm">
-            <option value="اليمين">على اليمين</option>
-            <option value="اليسار">على اليسار</option>
-          </select>
+        <div id="herbsListContainer" class="space-y-2">
+          <!-- عناصر القائمة تظهر هنا ديناميكياً -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. نافذة البحث الشامل -->
+    <section id="tab-search" class="space-y-4 hidden">
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow">
+        <label class="block text-xs font-bold mb-2 text-emerald-300">🔍 بحث فوري في كافة البروفايلات:</label>
+        <input type="text" id="searchInput" oninput="searchHerbs()" placeholder="ابحث باسم العشبة..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition">
+      </div>
+
+      <div id="searchResultsBox" class="space-y-2">
+        <div class="text-center text-slate-500 text-xs py-8">اكتب اسم أي عشبة للبحث عنها في كل الحسابات والرفوف.</div>
+      </div>
+    </section>
+
+    <!-- 3. نافذة الإعدادات والبروفايلات -->
+    <section id="tab-settings" class="space-y-4 hidden">
+      <!-- إدارة البروفايلات والأسماء -->
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow space-y-3">
+        <h3 class="text-sm font-bold text-slate-200">👥 إدارة وتعديل البروفايلات</h3>
+        
+        <div class="flex gap-2">
+          <input type="text" id="newProfileInput" placeholder="اسم بروفايل جديد..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          <button onclick="createNewUser()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap">+ إضافة</button>
+        </div>
+
+        <div class="pt-2 border-t border-slate-800">
+          <p class="text-[11px] text-slate-400 mb-2">البروفايلات المسجلة (اضغط لتعديل الاسم):</p>
+          <div id="profilesManageList" class="space-y-2">
+            <!-- قائمة تعديل البروفايلات -->
+          </div>
         </div>
       </div>
 
-      <button onclick="addHerbs()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg transition text-sm">
-        حفظ المواقع
+      <!-- استيراد وتصدير البيانات -->
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow space-y-3">
+        <h3 class="text-sm font-bold text-slate-200">💾 النسخ الاحتياطي (Backup)</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">قم بتصدير ملف يحتوي على كافة البروفايلات والأعشاب لنقله لهاتف آخر أو استرجاعه في أي وقت.</p>
+        
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="exportData()" class="bg-blue-600 active:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-xl transition text-center">
+            📥 تصدير الملف
+          </button>
+          <label class="bg-purple-600 active:bg-purple-700 text-white text-xs font-bold py-2.5 rounded-xl transition text-center cursor-pointer">
+            📤 استيراد ملف
+            <input type="file" id="importFileInput" accept=".json" onchange="importData(event)" class="hidden">
+          </label>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- شريط التنقل السفلي الثابت للجوّال (Bottom Navigation Bar) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-6 py-2.5">
+    <div class="max-w-md mx-auto flex justify-around items-center">
+      
+      <!-- زر الإضافة والمخزون -->
+      <button onclick="switchTab('tab-add', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 nav-active transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <span class="text-[11px] font-bold">المخزون</span>
       </button>
+
+      <!-- زر البحث -->
+      <button onclick="switchTab('tab-search', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+        <span class="text-[11px] font-bold">البحث الشامل</span>
+      </button>
+
+      <!-- زر الإعدادات والتصدير -->
+      <button onclick="switchTab('tab-settings', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
+        <span class="text-[11px] font-bold">الإعدادات</span>
+      </button>
+
     </div>
-
-    <!-- جدول عرض الأعشاب -->
-    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="font-bold text-sm text-slate-200">الأعشاب المسجلة (<span id="totalCount">0</span>)</h3>
-        <button onclick="clearUserHerbs()" class="text-xs text-rose-400 hover:text-rose-300 underline">مسح سجل هذا المستخدم</button>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-right text-sm">
-          <thead class="bg-slate-900/60 text-slate-400 border-b border-slate-700 text-xs">
-            <tr>
-              <th class="p-2.5">العشبة</th>
-              <th class="p-2.5">الموقع التخزيني</th>
-              <th class="p-2.5 text-center">إجراء</th>
-            </tr>
-          </thead>
-          <tbody id="herbsTableBody" class="divide-y divide-slate-700 text-slate-300">
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
+  </nav>
 
   <script>
-    // جلب قائمة المستخدمين والمستخدم النشط
-    let usersList = JSON.parse(localStorage.getItem('herb_users_list') || '["المستخدم 1"]');
+    let usersList = JSON.parse(localStorage.getItem('herb_users_list') || '["الرئيسي"]');
     let currentUser = localStorage.getItem('active_herb_user') || usersList[0];
 
     function initApp() {
-      if (!usersList.includes(currentUser)) {
-        currentUser = usersList[0];
-      }
+      if (!usersList.includes(currentUser)) currentUser = usersList[0];
       localStorage.setItem('active_herb_user', currentUser);
       localStorage.setItem('herb_users_list', JSON.stringify(usersList));
 
-      updateUserSelectorUI();
-      renderTable();
+      updateUserUI();
+      renderHerbsList();
+      renderProfilesSettings();
     }
 
-    function updateUserSelectorUI() {
+    function switchTab(tabId, el) {
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active'));
+      el.classList.add('nav-active');
+
+      if (tabId === 'tab-search') {
+        document.getElementById('searchInput').focus();
+        searchHerbs();
+      }
+      if (tabId === 'tab-settings') {
+        renderProfilesSettings();
+      }
+    }
+
+    function updateUserUI() {
       const select = document.getElementById('userSelector');
       select.innerHTML = '';
       usersList.forEach(user => {
@@ -125,43 +196,47 @@
         if (user === currentUser) opt.selected = true;
         select.appendChild(opt);
       });
-      document.getElementById('currentUserName').textContent = currentUser;
-    }
-
-    function createNewUser() {
-      const name = prompt('أدخل اسم الشخص أو المعرف الجديد:');
-      if (name && name.trim()) {
-        const trimmed = name.trim();
-        if (!usersList.includes(trimmed)) {
-          usersList.push(trimmed);
-          localStorage.setItem('herb_users_list', JSON.stringify(usersList));
-        }
-        currentUser = trimmed;
-        localStorage.setItem('active_herb_user', currentUser);
-        updateUserSelectorUI();
-        renderTable();
-      }
+      document.getElementById('currentProfileNameHeader').textContent = currentUser;
     }
 
     function switchUser() {
       currentUser = document.getElementById('userSelector').value;
       localStorage.setItem('active_herb_user', currentUser);
-      document.getElementById('currentUserName').textContent = currentUser;
-      document.getElementById('searchInput').value = '';
-      document.getElementById('searchAlert').className = 'hidden';
-      renderTable();
+      document.getElementById('currentProfileNameHeader').textContent = currentUser;
+      renderHerbsList();
+      checkDuplicateOnInput();
     }
 
-    function getActiveUserData() {
-      const userKey = `herbs_data_${currentUser}`;
-      return JSON.parse(localStorage.getItem(userKey) || '[]');
+    function getUserData(userName) {
+      return JSON.parse(localStorage.getItem(`herbs_data_${userName}`) || '[]');
     }
 
-    function saveActiveUserData(data) {
-      const userKey = `herbs_data_${currentUser}`;
-      localStorage.setItem(userKey, JSON.stringify(data));
-      renderTable();
-      searchHerbs();
+    function saveUserData(userName, data) {
+      localStorage.setItem(`herbs_data_${userName}`, JSON.stringify(data));
+      if (userName === currentUser) renderHerbsList();
+    }
+
+    // فحص التكرار اللحظي باللون الأصفر أثناء الكتابة
+    function checkDuplicateOnInput() {
+      const text = document.getElementById('herbNames').value.trim();
+      const alertBox = document.getElementById('duplicateAlert');
+
+      if (!text) {
+        alertBox.classList.add('hidden');
+        return;
+      }
+
+      const currentItems = getUserData(currentUser).map(h => h.name.toLowerCase());
+      const inputs = text.split(/[\n,،]+/).map(n => n.trim().toLowerCase()).filter(Boolean);
+      
+      const duplicatesFound = inputs.filter(name => currentItems.includes(name));
+
+      if (duplicatesFound.length > 0) {
+        alertBox.classList.remove('hidden');
+        alertBox.innerHTML = `⚠️ تنبيه: العشبة (<span class="text-white underline">${duplicatesFound.join('، ')}</span>) مضافة مسبقاً في هذا البروفايل، سيتم تحديث موقعها فقط.`;
+      } else {
+        alertBox.classList.add('hidden');
+      }
     }
 
     function addHerbs() {
@@ -169,12 +244,9 @@
       const floor = document.getElementById('floorSelect').value;
       const side = document.getElementById('sideSelect').value;
 
-      if (!rawNames) {
-        alert('يرجى إدخال اسم العشبة أولاً');
-        return;
-      }
+      if (!rawNames) return alert('يرجى كتابة اسم العشبة أولاً');
 
-      const list = getActiveUserData();
+      const list = getUserData(currentUser);
       const names = rawNames.split(/[\n,،]+/).map(n => n.trim()).filter(Boolean);
 
       names.forEach(name => {
@@ -188,74 +260,214 @@
       });
 
       document.getElementById('herbNames').value = '';
-      saveActiveUserData(list);
+      document.getElementById('duplicateAlert').classList.add('hidden');
+      saveUserData(currentUser, list);
     }
 
     function deleteHerb(index) {
-      const list = getActiveUserData();
+      const list = getUserData(currentUser);
       list.splice(index, 1);
-      saveActiveUserData(list);
+      saveUserData(currentUser, list);
     }
 
-    function clearUserHerbs() {
-      if (confirm(`هل أنت متأكد من مسح جميع بيانات (${currentUser})؟`)) {
-        saveActiveUserData([]);
+    // تأكيد مزدوج لمسح السجل لمنع الخطأ
+    function promptClearUserHerbs() {
+      const confirmation1 = confirm(`هل أنت متأكد تماماً من رغبتك في مسح كافة أعشاب بروفايل (${currentUser})؟`);
+      if (confirmation1) {
+        const confirmName = prompt(`تحذير نهائي: اكتب اسم البروفايل "${currentUser}" للتأكيد:`);
+        if (confirmName && confirmName.trim() === currentUser) {
+          saveUserData(currentUser, []);
+          alert('تم مسح السجل بنجاح.');
+        } else {
+          alert('لم يتم التأكيد، تم إلغاء المسح.');
+        }
       }
     }
 
-    function searchHerbs() {
-      const query = document.getElementById('searchInput').value.trim().toLowerCase();
-      const alertBox = document.getElementById('searchAlert');
-      const list = getActiveUserData();
-
-      if (!query) {
-        alertBox.className = 'hidden';
-        renderTable(list);
-        return;
-      }
-
-      const match = list.find(h => h.name.toLowerCase().includes(query));
-      const filtered = list.filter(h => h.name.toLowerCase().includes(query));
-
-      alertBox.classList.remove('hidden');
-      if (match) {
-        alertBox.className = 'mt-3 p-3 rounded-lg text-center font-bold text-sm bg-emerald-950/80 border border-emerald-500 text-emerald-200';
-        alertBox.innerHTML = `📍 موقع <span class="text-white underline">${match.name}</span>: <span class="text-yellow-400">${match.floor} — على ${match.side}</span>`;
-      } else {
-        alertBox.className = 'mt-3 p-3 rounded-lg text-center font-semibold text-xs bg-rose-950/60 border border-rose-500/50 text-rose-300';
-        alertBox.textContent = 'العشبة غير مسجلة في قائمة هذا المستخدم.';
-      }
-
-      renderTable(filtered);
-    }
-
-    function renderTable(displayList = null) {
-      const list = displayList !== null ? displayList : getActiveUserData();
-      const tbody = document.getElementById('herbsTableBody');
-      document.getElementById('totalCount').textContent = getActiveUserData().length;
-      tbody.innerHTML = '';
+    // عرض القائمة للبروفايل الحالي
+    function renderHerbsList() {
+      const list = getUserData(currentUser);
+      const container = document.getElementById('herbsListContainer');
+      document.getElementById('totalCount').textContent = list.length;
+      container.innerHTML = '';
 
       if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-slate-500 text-xs">لا توجد أعشاب مسجلة.</td></tr>';
+        container.innerHTML = '<p class="text-center py-6 text-slate-500 text-xs">لا توجد أعشاب مسجلة في هذا البروفايل حتى الآن.</p>';
         return;
       }
 
       list.forEach((item, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-700/40 transition';
-        tr.innerHTML = `
-          <td class="p-2.5 font-medium text-slate-100">${item.name}</td>
-          <td class="p-2.5">
-            <span class="inline-block bg-slate-900 border border-slate-700 rounded px-2 py-0.5 text-xs text-yellow-300">
-              ${item.floor} على ${item.side}
-            </span>
-          </td>
-          <td class="p-2.5 text-center">
-            <button onclick="deleteHerb(${idx})" class="text-xs text-rose-400 hover:text-rose-300">حذف</button>
-          </td>
+        const card = document.createElement('div');
+        card.className = 'flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800/80';
+        card.innerHTML = `
+          <div>
+            <div class="font-bold text-sm text-slate-100">${item.name}</div>
+            <div class="text-[11px] text-amber-300">📍 ${item.floor} — على ${item.side}</div>
+          </div>
+          <button onclick="deleteHerb(${idx})" class="text-xs text-rose-400 p-1.5 hover:bg-rose-950/40 rounded-lg">حذف</button>
         `;
-        tbody.appendChild(tr);
+        container.appendChild(card);
       });
+    }
+
+    // بحث شامل في كل البروفايلات
+    function searchHerbs() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const resultsBox = document.getElementById('searchResultsBox');
+
+      if (!query) {
+        resultsBox.innerHTML = '<div class="text-center text-slate-500 text-xs py-8">اكتب اسم أي عشبة للبحث عنها في كل الحسابات والرفوف.</div>';
+        return;
+      }
+
+      let matches = [];
+      usersList.forEach(user => {
+        const items = getUserData(user);
+        items.forEach(item => {
+          if (item.name.toLowerCase().includes(query)) {
+            matches.push({ ...item, owner: user });
+          }
+        });
+      });
+
+      resultsBox.innerHTML = '';
+      if (matches.length === 0) {
+        resultsBox.innerHTML = '<div class="p-3 text-center text-xs bg-rose-950/50 border border-rose-500/40 text-rose-300 rounded-xl">غير موجودة في أي بروفايل.</div>';
+        return;
+      }
+
+      matches.forEach(res => {
+        const isCurrent = res.owner === currentUser;
+        const div = document.createElement('div');
+        div.className = `p-3 rounded-xl border flex justify-between items-center text-xs ${isCurrent ? 'bg-emerald-950/50 border-emerald-500/60' : 'bg-slate-900 border-amber-500/50'}`;
+        div.innerHTML = `
+          <div>
+            <div class="font-bold text-sm text-white">${res.name}</div>
+            <div class="text-[11px] text-slate-300 mt-0.5">📍 ${res.floor} — على ${res.side}</div>
+          </div>
+          <span class="text-[10px] px-2 py-1 rounded-md font-semibold ${isCurrent ? 'bg-emerald-800 text-emerald-200' : 'bg-amber-900 text-amber-200'}">
+            ${isCurrent ? 'بروفايلك الحالي' : `موجودة بـ: ${res.owner}`}
+          </span>
+        `;
+        resultsBox.appendChild(div);
+      });
+    }
+
+    // إدارة البروفايلات وتعديل الأسماء
+    function renderProfilesSettings() {
+      const container = document.getElementById('profilesManageList');
+      container.innerHTML = '';
+
+      usersList.forEach((user, idx) => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800';
+        div.innerHTML = `
+          <span class="text-xs font-semibold ${user === currentUser ? 'text-emerald-400' : 'text-slate-200'}">
+            ${user} ${user === currentUser ? '(النشط)' : ''}
+          </span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="editProfileName('${user}')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-1 rounded-lg">تعديل الاسم</button>
+            ${usersList.length > 1 ? `<button onclick="deleteProfile('${user}')" class="text-[11px] text-rose-400 hover:bg-rose-950/30 px-1.5 py-1 rounded-lg">حذف</button>` : ''}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function createNewUser() {
+      const input = document.getElementById('newProfileInput');
+      const name = input.value.trim();
+      if (!name) return;
+
+      if (usersList.includes(name)) return alert('الاسم موجود بالفعل');
+
+      usersList.push(name);
+      localStorage.setItem('herb_users_list', JSON.stringify(usersList));
+      currentUser = name;
+      localStorage.setItem('active_herb_user', currentUser);
+      input.value = '';
+      initApp();
+    }
+
+    function editProfileName(oldName) {
+      const newName = prompt(`تعديل اسم البروفايل "${oldName}" إلى:`, oldName);
+      if (!newName || !newName.trim() || newName.trim() === oldName) return;
+
+      const trimmed = newName.trim();
+      if (usersList.includes(trimmed)) return alert('هذا الاسم مستخدم مسبقاً');
+
+      // نقل البيانات للاسم الجديد
+      const data = getUserData(oldName);
+      localStorage.setItem(`herbs_data_${trimmed}`, JSON.stringify(data));
+      localStorage.removeItem(`herbs_data_${oldName}`);
+
+      const idx = usersList.indexOf(oldName);
+      usersList[idx] = trimmed;
+      localStorage.setItem('herb_users_list', JSON.stringify(usersList));
+
+      if (currentUser === oldName) {
+        currentUser = trimmed;
+        localStorage.setItem('active_herb_user', currentUser);
+      }
+
+      initApp();
+      alert('تم تعديل الاسم بنجاح.');
+    }
+
+    function deleteProfile(userName) {
+      if (confirm(`هل أنت متأكد من حذف بروفايل (${userName}) بالكامل مع كافة بياناته؟`)) {
+        localStorage.removeItem(`herbs_data_${userName}`);
+        usersList = usersList.filter(u => u !== userName);
+        localStorage.setItem('herb_users_list', JSON.stringify(usersList));
+        if (currentUser === userName) currentUser = usersList[0];
+        localStorage.setItem('active_herb_user', currentUser);
+        initApp();
+      }
+    }
+
+    // تصدير البيانات بالكامل
+    function exportData() {
+      const fullBackup = {
+        users: usersList,
+        data: {}
+      };
+      usersList.forEach(u => {
+        fullBackup.data[u] = getUserData(u);
+      });
+
+      const blob = new Blob([JSON.stringify(fullBackup, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `herbs_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          if (!parsed.users || !parsed.data) throw new Error();
+
+          localStorage.setItem('herb_users_list', JSON.stringify(parsed.users));
+          usersList = parsed.users;
+
+          Object.keys(parsed.data).forEach(userKey => {
+            localStorage.setItem(`herbs_data_${userKey}`, JSON.stringify(parsed.data[userKey]));
+          });
+
+          currentUser = usersList[0];
+          localStorage.setItem('active_herb_user', currentUser);
+          initApp();
+          alert('تم استيراد كافة البيانات بنجاح!');
+        } catch (err) {
+          alert('الملف غير صالح للنسخ الاحتياطي.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     initApp();
