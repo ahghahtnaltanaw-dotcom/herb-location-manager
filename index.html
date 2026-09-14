@@ -14,7 +14,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-24">
 
-  <!-- الرأس العلوي الثابت -->
+  <!-- الرأس العلوي -->
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 shadow-sm">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div>
@@ -28,7 +28,7 @@
     </div>
   </header>
 
-  <!-- المحتوى التفاعلي (3 تبويبات) -->
+  <!-- المحتوى التفاعلي -->
   <main class="max-w-md mx-auto p-4">
 
     <!-- 1. نافذة الإضافة والمخزون -->
@@ -39,14 +39,15 @@
         <div>
           <label class="block text-xs text-slate-400 mb-1">اسم العشبة (واحدة أو أكثر مفصولة بفاصلة ،):</label>
           <textarea id="herbNames" rows="2" oninput="checkDuplicateOnInput()" placeholder="مثال: لسان الحمل، سانوج، داد" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"></textarea>
-          <!-- تنبيه التكرار الفوري -->
-          <div id="duplicateAlert" class="hidden mt-1.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-semibold">
+          
+          <!-- صندوق التنبيهات المتعددة المتتالية -->
+          <div id="duplicateAlertBox" class="hidden mt-2 space-y-1.5">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2.5">
           <div>
-            <label class="block text-[11px] text-slate-400 mb-1">الطابق (الرف):</label>
+            <label class="block text-[11px] text-slate-400 mb-1">الطابق (الرف الجديد):</label>
             <select id="floorSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white focus:outline-none">
               <option value="الطابق الأول">الطابق 1</option>
               <option value="الطابق الثاني">الطابق 2</option>
@@ -76,7 +77,6 @@
         </div>
 
         <div id="herbsListContainer" class="space-y-2">
-          <!-- عناصر القائمة تظهر هنا ديناميكياً -->
         </div>
       </div>
     </section>
@@ -95,7 +95,6 @@
 
     <!-- 3. نافذة الإعدادات والبروفايلات -->
     <section id="tab-settings" class="space-y-4 hidden">
-      <!-- إدارة البروفايلات والأسماء -->
       <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow space-y-3">
         <h3 class="text-sm font-bold text-slate-200">👥 إدارة وتعديل البروفايلات</h3>
         
@@ -105,17 +104,15 @@
         </div>
 
         <div class="pt-2 border-t border-slate-800">
-          <p class="text-[11px] text-slate-400 mb-2">البروفايلات المسجلة (اضغط لتعديل الاسم):</p>
+          <p class="text-[11px] text-slate-400 mb-2">البروفايلات المسجلة:</p>
           <div id="profilesManageList" class="space-y-2">
-            <!-- قائمة تعديل البروفايلات -->
           </div>
         </div>
       </div>
 
-      <!-- استيراد وتصدير البيانات -->
       <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow space-y-3">
         <h3 class="text-sm font-bold text-slate-200">💾 النسخ الاحتياطي (Backup)</h3>
-        <p class="text-xs text-slate-400 leading-relaxed">قم بتصدير ملف يحتوي على كافة البروفايلات والأعشاب لنقله لهاتف آخر أو استرجاعه في أي وقت.</p>
+        <p class="text-xs text-slate-400 leading-relaxed">تصدير قاعدة البيانات بالكامل أو استيرادها من ملف خارجي.</p>
         
         <div class="grid grid-cols-2 gap-2 pt-1">
           <button onclick="exportData()" class="bg-blue-600 active:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-xl transition text-center">
@@ -131,23 +128,20 @@
 
   </main>
 
-  <!-- شريط التنقل السفلي الثابت للجوّال (Bottom Navigation Bar) -->
+  <!-- شريط التنقل السفلي -->
   <nav class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-6 py-2.5">
     <div class="max-w-md mx-auto flex justify-around items-center">
       
-      <!-- زر الإضافة والمخزون -->
       <button onclick="switchTab('tab-add', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 nav-active transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
         <span class="text-[11px] font-bold">المخزون</span>
       </button>
 
-      <!-- زر البحث -->
       <button onclick="switchTab('tab-search', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
         <span class="text-[11px] font-bold">البحث الشامل</span>
       </button>
 
-      <!-- زر الإعدادات والتصدير -->
       <button onclick="switchTab('tab-settings', this)" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
         <span class="text-[11px] font-bold">الإعدادات</span>
@@ -216,25 +210,44 @@
       if (userName === currentUser) renderHerbsList();
     }
 
-    // فحص التكرار اللحظي باللون الأصفر أثناء الكتابة
+    // فحص التكرارات وعرض كل عشبة مكررة وموقعها القديم في سطر منفصل
     function checkDuplicateOnInput() {
       const text = document.getElementById('herbNames').value.trim();
-      const alertBox = document.getElementById('duplicateAlert');
+      const alertBox = document.getElementById('duplicateAlertBox');
 
       if (!text) {
+        alertBox.innerHTML = '';
         alertBox.classList.add('hidden');
         return;
       }
 
-      const currentItems = getUserData(currentUser).map(h => h.name.toLowerCase());
-      const inputs = text.split(/[\n,،]+/).map(n => n.trim().toLowerCase()).filter(Boolean);
+      const currentItems = getUserData(currentUser);
+      const inputs = text.split(/[\n,،]+/).map(n => n.trim()).filter(Boolean);
       
-      const duplicatesFound = inputs.filter(name => currentItems.includes(name));
+      let matchedItems = [];
 
-      if (duplicatesFound.length > 0) {
+      inputs.forEach(inputName => {
+        const found = currentItems.find(h => h.name.toLowerCase() === inputName.toLowerCase());
+        if (found && !matchedItems.some(m => m.name.toLowerCase() === found.name.toLowerCase())) {
+          matchedItems.push(found);
+        }
+      });
+
+      if (matchedItems.length > 0) {
         alertBox.classList.remove('hidden');
-        alertBox.innerHTML = `⚠️ تنبيه: العشبة (<span class="text-white underline">${duplicatesFound.join('، ')}</span>) مضافة مسبقاً في هذا البروفايل، سيتم تحديث موقعها فقط.`;
+        alertBox.innerHTML = '';
+
+        matchedItems.forEach(item => {
+          const alertLine = document.createElement('div');
+          alertLine.className = 'p-2 rounded-lg bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs flex justify-between items-center';
+          alertLine.innerHTML = `
+            <span>⚠️ <b>${item.name}</b> مكررة (موقعها الحالي: <span class="text-white">${item.floor} على ${item.side}</span>)</span>
+            <span class="text-[10px] bg-amber-950/60 text-amber-200 px-1.5 py-0.5 rounded border border-amber-500/30">تحديث</span>
+          `;
+          alertBox.appendChild(alertLine);
+        });
       } else {
+        alertBox.innerHTML = '';
         alertBox.classList.add('hidden');
       }
     }
@@ -260,7 +273,8 @@
       });
 
       document.getElementById('herbNames').value = '';
-      document.getElementById('duplicateAlert').classList.add('hidden');
+      document.getElementById('duplicateAlertBox').innerHTML = '';
+      document.getElementById('duplicateAlertBox').classList.add('hidden');
       saveUserData(currentUser, list);
     }
 
@@ -268,9 +282,9 @@
       const list = getUserData(currentUser);
       list.splice(index, 1);
       saveUserData(currentUser, list);
+      checkDuplicateOnInput();
     }
 
-    // تأكيد مزدوج لمسح السجل لمنع الخطأ
     function promptClearUserHerbs() {
       const confirmation1 = confirm(`هل أنت متأكد تماماً من رغبتك في مسح كافة أعشاب بروفايل (${currentUser})؟`);
       if (confirmation1) {
@@ -284,7 +298,6 @@
       }
     }
 
-    // عرض القائمة للبروفايل الحالي
     function renderHerbsList() {
       const list = getUserData(currentUser);
       const container = document.getElementById('herbsListContainer');
@@ -310,7 +323,6 @@
       });
     }
 
-    // بحث شامل في كل البروفايلات
     function searchHerbs() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const resultsBox = document.getElementById('searchResultsBox');
@@ -353,12 +365,11 @@
       });
     }
 
-    // إدارة البروفايلات وتعديل الأسماء
     function renderProfilesSettings() {
       const container = document.getElementById('profilesManageList');
       container.innerHTML = '';
 
-      usersList.forEach((user, idx) => {
+      usersList.forEach((user) => {
         const div = document.createElement('div');
         div.className = 'flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800';
         div.innerHTML = `
@@ -396,7 +407,6 @@
       const trimmed = newName.trim();
       if (usersList.includes(trimmed)) return alert('هذا الاسم مستخدم مسبقاً');
 
-      // نقل البيانات للاسم الجديد
       const data = getUserData(oldName);
       localStorage.setItem(`herbs_data_${trimmed}`, JSON.stringify(data));
       localStorage.removeItem(`herbs_data_${oldName}`);
@@ -425,7 +435,6 @@
       }
     }
 
-    // تصدير البيانات بالكامل
     function exportData() {
       const fullBackup = {
         users: usersList,
